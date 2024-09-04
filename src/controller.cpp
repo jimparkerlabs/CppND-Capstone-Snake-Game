@@ -27,15 +27,24 @@ void Controller::HandleInput(bool &running, Snake &snake) const {
           break;
 
         case SDLK_LEFT:
-          ChangeDirection(snake, Snake::Direction::kLeft,
-                          Snake::Direction::kRight);
+              ChangeDirection(snake, Snake::Direction::kLeft,
+                            Snake::Direction::kRight);
+              ChangeHeading(snake, -M_PI / 2.0f);
           break;
 
         case SDLK_RIGHT:
-          ChangeDirection(snake, Snake::Direction::kRight,
+            ChangeDirection(snake, Snake::Direction::kRight,
                           Snake::Direction::kLeft);
+              ChangeHeading(snake, M_PI / 2.0f);
           break;
       }
     }
   }
+}
+
+void Controller::ChangeHeading(Snake &snake, float radians) const {
+    int x = snake.heading.x;
+    int y = snake.heading.y;
+    snake.heading.x = x * std::cos(radians) - y * std::sin(radians);
+    snake.heading.y = x * std::sin(radians) + y * std::cos(radians);
 }

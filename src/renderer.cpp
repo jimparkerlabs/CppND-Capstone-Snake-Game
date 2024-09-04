@@ -39,43 +39,80 @@ Renderer::~Renderer() {
 }
 
 void Renderer::Render(Snake const snake, SDL_Point const &food) {
-  SDL_Rect block;
-  block.w = screen_width / grid_width;
-  block.h = screen_height / grid_height;
+    const std::size_t food_size = 10;
 
-  // Clear screen
-  SDL_SetRenderDrawColor(sdl_renderer, 0x1E, 0x1E, 0x1E, 0xFF);
-  SDL_RenderClear(sdl_renderer);
+    // Clear screen
+    SDL_SetRenderDrawColor(sdl_renderer, 0x1E, 0x1E, 0x1E, 0xFF);
+    SDL_RenderClear(sdl_renderer);
 
-  // Render food
-  SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xCC, 0x00, 0xFF);
-  block.x = food.x * block.w;
-  block.y = food.y * block.h;
-  SDL_RenderFillRect(sdl_renderer, &block);
+    // Render food
+    {
+        SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xCC, 0x00, 0xFF);
+        auto center = render_coordinates(food.x, food.y);
 
-  // Render snake's body
-  SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-  for (SDL_Point const &point : snake.body) {
-    block.x = point.x * block.w;
-    block.y = point.y * block.h;
-    SDL_RenderFillRect(sdl_renderer, &block);
-  }
+//    fillRect(sdl_renderer, center, food_size, food_size);
+        fillCircle(sdl_renderer, center, food_size / 2);
+    }
 
-  // Render snake's head
-  block.x = static_cast<int>(snake.head_x) * block.w;
-  block.y = static_cast<int>(snake.head_y) * block.h;
-  if (snake.alive) {
-    SDL_SetRenderDrawColor(sdl_renderer, 0x00, 0x7A, 0xCC, 0xFF);
-  } else {
-    SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x00, 0x00, 0xFF);
-  }
-  SDL_RenderFillRect(sdl_renderer, &block);
+    // Render snake's body
+    // TODO: move snake_segment_size and snake_color, etc to Snake class
+    // TODO: also allow various head shapes, segment shapes, and segment separations
+    const std::size_t snake_segment_size = 10;
 
-  // Update Screen
-  SDL_RenderPresent(sdl_renderer);
+    SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    for (SDL_Point const &point : snake.body) {
+        SDL_Point center = render_coordinates(point);
+        fillRect(sdl_renderer, center, snake_segment_size, snake_segment_size);
+    }
+
+    // Render snake's head
+    const std::size_t snake_head_size = 14;
+
+    if (snake.alive) {
+        SDL_SetRenderDrawColor(sdl_renderer, 0x00, 0x7A, 0xCC, 0xFF);
+    } else {
+        SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x00, 0x00, 0xFF);
+    }
+    SDL_Point render_point = render_coordinates(snake.head_x, snake.head_y);
+
+    fillCircle(sdl_renderer, render_point, snake_head_size / 2);
+
+    // Update Screen
+    SDL_RenderPresent(sdl_renderer);
 }
 
 void Renderer::UpdateWindowTitle(int score, int fps) {
   std::string title{"Snake Score: " + std::to_string(score) + " FPS: " + std::to_string(fps)};
   SDL_SetWindowTitle(sdl_window, title.c_str());
 }
+
+SDL_Point Renderer::render_coordinates(std::size_t grid_x, std::size_t grid_y) {
+    return SDL_Point {static_cast<int>(static_cast<double>(grid_x)  / grid_width * screen_width), static_cast<int>(static_cast<double>(grid_y) / grid_height * screen_height)};
+}
+
+SDL_Point Renderer::render_coordinates(SDL_Point point) {
+    return SDL_Point {static_cast<int>(static_cast<double>(point.x)  / grid_width * screen_width), static_cast<int>(static_cast<double>(point.y) / grid_height * screen_height)};
+}
+
+void Renderer::fillCircle(SDL_Renderer* renderer, SDL_Point center, int32_t radius)
+{
+    for(int y = -radius; y <= radius; y++)
+    {
+        for(int x = -radius; x <= radius; x++)
+        {
+            if(x * x + y * y <= radius * radius)
+            {
+                SDL_RenderDrawPoint(renderer, center.x + x, center.y + y);
+            }
+        }
+    }
+}
+
+void Renderer::fillRect(SDL_Renderer *renderer, SDL_Point center, int32_t width, int32_t height) {
+    SDL_Rect glyph {center.x - width / 2, center.y + height / 2, width, height};
+    SDL_RenderFillRect(sdl_renderer, &glyph);
+}
+
+//void Renderer::fillRect(SDL_Renderer *renderer, SDL_Rect &glyph) {
+//    SDL_RenderFillRect(sdl_renderer, &glyph);
+//}

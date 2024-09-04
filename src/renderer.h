@@ -22,6 +22,13 @@ class Renderer {
   const std::size_t screen_height;
   const std::size_t grid_width;
   const std::size_t grid_height;
+
+  SDL_Point render_coordinates(std::size_t grid_x, std::size_t grid_y);
+  SDL_Point render_coordinates(SDL_Point point);
+
+  void fillCircle(SDL_Renderer* renderer, SDL_Point center, int32_t radius);
+    void fillRect(SDL_Renderer* renderer, SDL_Point center, int32_t width, int32_t height);
+//    void fillRect(SDL_Renderer* renderer, SDL_Rect &glyph);
 };
 
 #endif
