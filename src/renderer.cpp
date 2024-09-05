@@ -38,45 +38,49 @@ Renderer::~Renderer() {
   SDL_Quit();
 }
 
-void Renderer::Render(Snake const snake, SDL_Point const &food) {
-    const std::size_t food_size = 10;
-
+void Renderer::Render(Snake const &snake, std::vector<Food> &food) {
     // Clear screen
     SDL_SetRenderDrawColor(sdl_renderer, 0x1E, 0x1E, 0x1E, 0xFF);
     SDL_RenderClear(sdl_renderer);
 
-    // Render food
+    // Render Food
+    const std::size_t food_size = 10;
+
     {
         SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xCC, 0x00, 0xFF);
-        auto center = render_coordinates(food.x, food.y);
+
+        for (Food const &fd: food) {
+            auto center = render_coordinates(fd.x, fd.y);
 
 //    fillRect(sdl_renderer, center, food_size, food_size);
-        fillCircle(sdl_renderer, center, food_size / 2);
+            fillCircle(sdl_renderer, center, food_size / 2);
+        }
     }
 
-    // Render snake's body
-    // TODO: move snake_segment_size and snake_color, etc to Snake class
-    // TODO: also allow various head shapes, segment shapes, and segment separations
-    const std::size_t snake_segment_size = 10;
-
-    SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-    for (SDL_Point const &point : snake.body) {
-        SDL_Point center = render_coordinates(point);
-        fillRect(sdl_renderer, center, snake_segment_size, snake_segment_size);
+    // Render snake body
+    // TODO: allow various head shapes, segment shapes, and segment separations
+    {
+//        int segmentRenderWidth = gridToScreen_x(snake.segment_size);
+//        int segmentRenderHeight = gridToScreen_y(snake.segment_size);
+        SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+        for (Snake::coordinate const &point: snake.body) {
+            SDL_Point center = render_coordinates(point);
+            fillCircle(sdl_renderer, center, gridToScreen_x(snake.segment_size / 2));
+        }
     }
 
     // Render snake's head
-    const std::size_t snake_head_size = 14;
+    {
+        if (snake.alive) {
+            SDL_SetRenderDrawColor(sdl_renderer, 0x00, 0x7A, 0xCC, 0xFF);
+        } else {
+            SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x00, 0x00, 0xFF);
+        }
 
-    if (snake.alive) {
-        SDL_SetRenderDrawColor(sdl_renderer, 0x00, 0x7A, 0xCC, 0xFF);
-    } else {
-        SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x00, 0x00, 0xFF);
+        SDL_Point render_point = render_coordinates(snake.head_x, snake.head_y);
+
+        fillCircle(sdl_renderer, render_point, gridToScreen_x(snake.head_size / 2));
     }
-    SDL_Point render_point = render_coordinates(snake.head_x, snake.head_y);
-
-    fillCircle(sdl_renderer, render_point, snake_head_size / 2);
-
     // Update Screen
     SDL_RenderPresent(sdl_renderer);
 }
@@ -86,12 +90,16 @@ void Renderer::UpdateWindowTitle(int score, int fps) {
   SDL_SetWindowTitle(sdl_window, title.c_str());
 }
 
-SDL_Point Renderer::render_coordinates(std::size_t grid_x, std::size_t grid_y) {
-    return SDL_Point {static_cast<int>(static_cast<double>(grid_x)  / grid_width * screen_width), static_cast<int>(static_cast<double>(grid_y) / grid_height * screen_height)};
+//SDL_Point Renderer::render_coordinates(std::size_t grid_x, std::size_t grid_y) {
+//    return SDL_Point {static_cast<int>(static_cast<double>(grid_x)  / grid_width * screen_width), static_cast<int>(static_cast<double>(grid_y) / grid_height * screen_height)};
+//}
+
+SDL_Point Renderer::render_coordinates(float grid_x, float grid_y) {
+    return SDL_Point {static_cast<int>(grid_x  / grid_width * screen_width), static_cast<int>(grid_y / grid_height * screen_height)};
 }
 
-SDL_Point Renderer::render_coordinates(SDL_Point point) {
-    return SDL_Point {static_cast<int>(static_cast<double>(point.x)  / grid_width * screen_width), static_cast<int>(static_cast<double>(point.y) / grid_height * screen_height)};
+SDL_Point Renderer::render_coordinates(Snake::coordinate point) {
+    return SDL_Point {static_cast<int>(point.x  / grid_width * screen_width), static_cast<int>(point.y / grid_height * screen_height)};
 }
 
 void Renderer::fillCircle(SDL_Renderer* renderer, SDL_Point center, int32_t radius)
@@ -109,7 +117,7 @@ void Renderer::fillCircle(SDL_Renderer* renderer, SDL_Point center, int32_t radi
 }
 
 void Renderer::fillRect(SDL_Renderer *renderer, SDL_Point center, int32_t width, int32_t height) {
-    SDL_Rect glyph {center.x - width / 2, center.y + height / 2, width, height};
+    SDL_Rect glyph {center.x - width / 2, center.y - height / 2, width, height};
     SDL_RenderFillRect(sdl_renderer, &glyph);
 }
 

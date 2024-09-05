@@ -6,6 +6,7 @@
 #include "controller.h"
 #include "renderer.h"
 #include "snake.h"
+#include "food.h"
 
 class Game {
  public:
@@ -17,14 +18,17 @@ class Game {
 
  private:
   Snake snake;
-  SDL_Point food;
+  std::vector<Food> food;
 
   std::random_device dev;
   std::mt19937 engine;
   std::uniform_int_distribution<int> random_w;
   std::uniform_int_distribution<int> random_h;
 
+  const int numFoodToPlace = 3;
   int score{0};
+
+  bool gotFood(Food food);
 
   void PlaceFood();
   void Update();

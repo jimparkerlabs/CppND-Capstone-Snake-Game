@@ -2,11 +2,15 @@
 #define SNAKE_H
 
 #include <vector>
-#include "SDL.h"
+//#include "SDL.h"
 
 class Snake {
  public:
   enum class Direction { kUp, kDown, kLeft, kRight };
+  struct coordinate {
+      float x;
+      float y;
+  };
 
   Snake(int grid_width, int grid_height)
       : grid_width(grid_width),
@@ -20,24 +24,34 @@ class Snake {
   bool SnakeCell(int x, int y);
 
   Direction direction = Direction::kUp;
-  SDL_Point heading {0, -1};
+  float heading_x {0.0f};
+  float heading_y {-1.0f};
 
-  float speed{0.5f};
-  int size{1};
+  float speed{1.0f};
+  float turnSpeed{M_PI / 18.0f};
+
+  const std::size_t segment_size = 10;
+  const std::size_t head_size = 12;
+  const std::size_t segment_separation = segment_size;
+
+  int size() const {return body.size() + 1;};
   bool alive{true};
   float head_x;
   float head_y;
-  std::vector<SDL_Point> body;
+  std::vector<coordinate> body;
 
  private:
-    void UpdateHead();
-    void UpdateBody(SDL_Point &current_cell, SDL_Point &prev_cell);
+    static std::pair<float, float> getBearing(const coordinate &from, const coordinate &to);
 
-    void update_point(SDL_Point &point);
-    void update_point(SDL_Point &point, const SDL_Point &to);
+    void UpdateHead();
+    void UpdateBody();
+
+    void update_point(coordinate &point);
+    coordinate updated_point(const coordinate &point, const coordinate &toward);
     void update_coordinates(float &x, float &y);
 
-    SDL_Point getBearing(const SDL_Point &from, const SDL_Point &to);
+    void addBodySegment(const coordinate &ref1, const coordinate &ref2);
+    void addBodySegment(const coordinate &ref, float bearing_x, float bearing_y);
 
     bool growing{false};
 
