@@ -10,7 +10,10 @@ Food::Food(int x, int y) : x(x), y(y) {
     std::mt19937 engine(dev());
     std::uniform_int_distribution<int> random_type(0, 3);
 
-    _type = static_cast<Type>( random_type(engine));
+    int rando = random_type(engine);
+    std::cout << rando << std::endl;
+
+    _type = static_cast<Type>(rando);
 }
 
 Food::Food(int x, int y, Type type) : x(x), y(y), _type(type) { }

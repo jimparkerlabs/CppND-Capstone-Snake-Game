@@ -85,7 +85,7 @@ void Renderer::Render(Snake const &snake, std::vector<Food> &food) {
             SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x00, 0x00, 0xFF);
         }
 
-        SDL_Point render_point = render_coordinates(snake.head_x, snake.head_y);
+        SDL_Point render_point = render_coordinates(snake.x, snake.y);
 
         fillCircle(sdl_renderer, render_point, gridToScreen_x(snake.head_size / 2));
     }

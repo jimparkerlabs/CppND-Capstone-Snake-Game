@@ -23,8 +23,10 @@ private:
 
     std::random_device dev;
     std::mt19937 engine;
-    std::uniform_int_distribution<int> random_w;
-    std::uniform_int_distribution<int> random_h;
+    std::uniform_real_distribution<float> random_w;
+    std::uniform_real_distribution<float> random_h;
+//    std::uniform_int_distribution<int> random_w;
+//    std::uniform_int_distribution<int> random_h;
 
     const int numFoodToPlace = 6;
     int score{0};

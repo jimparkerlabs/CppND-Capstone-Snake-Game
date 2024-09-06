@@ -5,7 +5,7 @@
 
 //void Controller::ChangeDirection(Snake &snake, Snake::Direction input,
 //                                 Snake::Direction opposite) const {
-//  if (snake.direction != opposite || snake.size() == 1) snake.direction = input;
+//  if (snake.direction != opposite || snake.numSegments() == 1) snake.direction = input;
 //  return;
 //}
 
@@ -36,14 +36,14 @@ void Controller::HandleInput(bool &running, Snake &snake) const {
         case SDLK_a:
 //              ChangeDirection(snake, Snake::Direction::kLeft,
 //                            Snake::Direction::kRight);
-              ChangeHeading(snake, -snake.turnSpeed * std::pow(1.05, snake.size()));
+              ChangeHeading(snake, -snake.turnSpeed * std::pow(1.05, snake.numSegments()));
           break;
 
         case SDLK_RIGHT:
         case SDLK_d:
 //            ChangeDirection(snake, Snake::Direction::kRight,
 //                          Snake::Direction::kLeft);
-              ChangeHeading(snake, snake.turnSpeed * std::pow(1.05, snake.size()));
+              ChangeHeading(snake, snake.turnSpeed * std::pow(1.05, snake.numSegments()));
           break;
 
           case SDLK_SPACE:
@@ -54,8 +54,8 @@ void Controller::HandleInput(bool &running, Snake &snake) const {
 }
 
 void Controller::ChangeHeading(Snake &snake, float radians) const {
-    float x = snake.heading_x;
-    float y = snake.heading_y;
-    snake.heading_x = x * std::cos(radians) - y * std::sin(radians);
-    snake.heading_y = x * std::sin(radians) + y * std::cos(radians);
+    float x = snake.heading.x;
+    float y = snake.heading.y;
+    snake.heading.x = x * std::cos(radians) - y * std::sin(radians);
+    snake.heading.y = x * std::sin(radians) + y * std::cos(radians);
 }

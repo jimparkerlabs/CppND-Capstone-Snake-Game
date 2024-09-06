@@ -1,15 +1,14 @@
 #include "snake.h"
 #include <cmath>
 #include <iostream>
-#include <cmath>
 
 void Snake::Update() {
     UpdateHead();
     UpdateBody();
 
     // wrap segments if necessary
-    head_x = fmod(head_x + grid_width, grid_width);
-    head_y = fmod(head_y + grid_height, grid_height);
+    x = fmod(x + grid_width, grid_width);
+    y = fmod(y + grid_height, grid_height);
 
     // iterate over body and do the same
     for (Snake::coordinate &point : body) {
@@ -19,16 +18,16 @@ void Snake::Update() {
 }
 
 void Snake::UpdateHead() {
-    move(head_x, head_y);
+    move();
 }
 
 void Snake::UpdateBody() {
     if (growing) {
         if (body.empty()) {
-            addBodySegment(coordinate{ head_x, head_y}, heading_x, heading_y);
+            addBodySegment(coordinate{x, y}, heading.x, heading.y);
             growing = false;
         } else if (body.size() == 1){
-            addBodySegment(coordinate {head_x, head_y}, body[0]);
+            addBodySegment(coordinate {x, y}, body[0]);
             growing = false;
         } else {
             addBodySegment(body.back(), body[body.size() - 2]);
@@ -38,7 +37,7 @@ void Snake::UpdateBody() {
 
     if (!body.empty()) {
         // move first body segment
-        body[0] = moveBody(body[0], Snake::coordinate{head_x, head_y});
+        body[0] = moveBody(body[0], Snake::coordinate{x, y});
     }
 
     for (std::size_t i = 1; i < body.size(); ++i) {
@@ -48,7 +47,7 @@ void Snake::UpdateBody() {
     // Check if the snake has died
     // TODO: change this to cut the snake
     for (auto const &item : body) {
-        if (head_x == item.x && head_y == item.y) {
+        if (x == item.x && y == item.y) {
             alive = false;
             std::cout << "You are dead!" << std::endl;
             alive = true;
@@ -57,55 +56,46 @@ void Snake::UpdateBody() {
 }
 
 void Snake::addBodySegment(const coordinate &ref1, const coordinate &ref2) {
-//    std::cout << "new segment, size= " << size << "  body.size() = " << body.size() << std::endl;
+//    std::cout << "new segment, size= " << size << "  body.size() = " << body.numSegments() << std::endl;
     auto [newBearing_x, newBearing_y] = getBearing(ref1, ref2);
     addBodySegment(ref1, newBearing_x, newBearing_y);
 //    body.push_back(SDL_Point{static_cast<int>(body.back().x - new_bearing.x * segment_separation),
 //                             static_cast<int>(body.back().y - new_bearing.y * segment_separation)});
-    //size++;
+    //numSegments++;
 }
 
 void Snake::addBodySegment(const coordinate &ref, float bearing_x, float bearing_y) {
-    //std::cout << "new segment, size= " << size << "  body.size() = " << body.size() << std::endl;
+    //std::cout << "new segment, size= " << size << "  body.size() = " << body.numSegments() << std::endl;
     body.push_back(coordinate {ref.x - bearing_x * segment_separation, ref.y - bearing_y * segment_separation});
 }
 
 void Snake::GrowBody() { growing = true; }
 
 // Inefficient method to check if cell is occupied by snake.
-bool Snake::isOccupying(int x, int y) {
-  if (x == static_cast<int>(head_x) && y == static_cast<int>(head_y)) {
+bool Snake::isOccupying(const coordinate &point) const {
+  if (point.x == x && point.y == y) {
     return true;
   }
   for (auto const &item : body) {
-    if (x == item.x && y == item.y) {
+    if (point.x == item.x && point.y == item.y) {
       return true;
     }
   }
   return false;
 }
 
-void Snake::move(coordinate &point) {
-    point.x += (speed * std::pow(1.05, body.size()) * heading_x);
-    point.y += (speed * std::pow(1.05, body.size()) * heading_y);
-}
+//void Snake::move() {
+//    x += (speed * std::pow(1.05, body.size()) * heading.x);
+//    y += (speed * std::pow(1.05, body.size()) * heading.y);
+//}
 
-void Snake::move(float &x, float &y) {
-    x += speed * std::pow(1.05, body.size()) * heading_x;
-    y += speed * std::pow(1.05, body.size())  * heading_y;
-}
+//void Snake::move() {
+//    x += (speed * heading.x);
+//    y += (speed * heading.y);
+//}
 
 Snake::coordinate Snake::moveBody(const coordinate &point, const coordinate &toward) {
     auto [bearing_x, bearing_y]  = getBearing(point, toward);
     return coordinate {toward.x - (segment_separation * bearing_x), toward.y - (segment_separation * bearing_y)};
 }
 
-std::pair<float, float> Snake::getBearing(const coordinate &from, const coordinate &to) {
-    float x = to.x - from.x;
-    float y = to.y - from.y;
-    float len = std::sqrt(x*x + y*y);
-    if (len > 0) {
-        return std::make_pair((x / len), (y / len));
-    }
-    return std::make_pair(x, y);
-}
