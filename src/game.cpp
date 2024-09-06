@@ -55,13 +55,11 @@ void Game::PlaceFood() {
   while (food.size() < numFoodToPlace) {
     x = random_w(engine);
     y = random_h(engine);
-    // Check that the location is not occupied by a snake item before placing
-    // Food.
-    if (!snake.SnakeCell(x, y)) {
-//      Food.x = x;
-//      Food.y = y;
-      food.emplace_back(Food {x, y});
+    // Check that the location is not occupied by a snake item before placing Food.
+    if (!snake.isOccupying(x, y)) {
+      food.emplace_back(x, y);
     }
+    std::cout << static_cast<int>(food.back().type()) << std::endl;
   }
 }
 
@@ -70,13 +68,13 @@ void Game::Update() {
 
     snake.Update();
 
-    int new_x = static_cast<int>(snake.head_x);
-    int new_y = static_cast<int>(snake.head_y);
+//    int new_x = static_cast<int>(snake.head_x);
+//    int new_y = static_cast<int>(snake.head_y);
 
     // Check if there's Food over here
     for (size_t i = 0; i < food.size(); ++i) {
         if (gotFood(food[i])) {
-            score++;
+            score+= static_cast<int>(food[i].energy());
             food.erase(food.begin() + i);
             // Grow snake and increase speed.
             snake.GrowBody();
@@ -87,10 +85,10 @@ void Game::Update() {
     }
 }
 
-bool Game::gotFood(Food food) {
+bool Game::gotFood(Food &fd) const {
     // retrun true if Food x and y are inside the rectangle centered at snake.head_x and snake.head_y with sides = snake.head_size
-    return (food.x >= snake.head_x - snake.head_size / 2 && food.x <= snake.head_x + snake.head_size / 2 &&
-            food.y >= snake.head_y - snake.head_size / 2 && food.y <= snake.head_y + snake.head_size / 2);
+    return (fd.x >= snake.head_x - snake.head_size / 2 && fd.x <= snake.head_x + snake.head_size / 2 &&
+            fd.y >= snake.head_y - snake.head_size / 2 && fd.y <= snake.head_y + snake.head_size / 2);
 }
 
 int Game::GetScore() const { return score; }

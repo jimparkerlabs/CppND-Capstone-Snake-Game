@@ -33,6 +33,7 @@ class Renderer {
 
     void fillCircle(SDL_Renderer* renderer, SDL_Point center, int32_t radius);
     void fillRect(SDL_Renderer* renderer, SDL_Point center, int32_t width, int32_t height);
+    void drawRect(SDL_Renderer* renderer, SDL_Point center, int32_t width, int32_t height);
 //    void fillRect(SDL_Renderer* renderer, SDL_Rect &glyph);
 };
 

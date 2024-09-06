@@ -6,7 +6,7 @@
 
 class Snake {
  public:
-  enum class Direction { kUp, kDown, kLeft, kRight };
+//  enum class Direction { kUp, kDown, kLeft, kRight };
   struct coordinate {
       float x;
       float y;
@@ -21,9 +21,9 @@ class Snake {
   void Update();
 
   void GrowBody();
-  bool SnakeCell(int x, int y);
+  bool isOccupying(int x, int y);
 
-  Direction direction = Direction::kUp;
+//  Direction direction = Direction::kUp;
   float heading_x {0.0f};
   float heading_y {-1.0f};
 
@@ -46,9 +46,9 @@ class Snake {
     void UpdateHead();
     void UpdateBody();
 
-    void update_point(coordinate &point);
-    coordinate updated_point(const coordinate &point, const coordinate &toward);
-    void update_coordinates(float &x, float &y);
+    void move(coordinate &point);
+    coordinate moveBody(const coordinate &point, const coordinate &toward);
+    void move(float &x, float &y);
 
     void addBodySegment(const coordinate &ref1, const coordinate &ref2);
     void addBodySegment(const coordinate &ref, float bearing_x, float bearing_y);

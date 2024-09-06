@@ -3,11 +3,11 @@
 #include "SDL.h"
 #include "snake.h"
 
-void Controller::ChangeDirection(Snake &snake, Snake::Direction input,
-                                 Snake::Direction opposite) const {
-  if (snake.direction != opposite || snake.size() == 1) snake.direction = input;
-  return;
-}
+//void Controller::ChangeDirection(Snake &snake, Snake::Direction input,
+//                                 Snake::Direction opposite) const {
+//  if (snake.direction != opposite || snake.size() == 1) snake.direction = input;
+//  return;
+//}
 
 void Controller::HandleInput(bool &running, Snake &snake) const {
   SDL_Event e;
@@ -18,31 +18,31 @@ void Controller::HandleInput(bool &running, Snake &snake) const {
       switch (e.key.keysym.sym) {
         case SDLK_UP:
         case SDLK_w:
-          ChangeDirection(snake, Snake::Direction::kUp,
-                          Snake::Direction::kDown);
+//          ChangeDirection(snake, Snake::Direction::kUp,
+//                          Snake::Direction::kDown);
 //          snake.speed *= 1.05;
 //          snake.turnSpeed *= 1.05;
           break;
 
         case SDLK_DOWN:
         case SDLK_s:
-          ChangeDirection(snake, Snake::Direction::kDown,
-                          Snake::Direction::kUp);
+//          ChangeDirection(snake, Snake::Direction::kDown,
+//                          Snake::Direction::kUp);
 //              snake.speed /= 1.05;
 //              snake.turnSpeed /= 1.05;
           break;
 
         case SDLK_LEFT:
         case SDLK_a:
-              ChangeDirection(snake, Snake::Direction::kLeft,
-                            Snake::Direction::kRight);
+//              ChangeDirection(snake, Snake::Direction::kLeft,
+//                            Snake::Direction::kRight);
               ChangeHeading(snake, -snake.turnSpeed * std::pow(1.05, snake.size()));
           break;
 
         case SDLK_RIGHT:
         case SDLK_d:
-            ChangeDirection(snake, Snake::Direction::kRight,
-                          Snake::Direction::kLeft);
+//            ChangeDirection(snake, Snake::Direction::kRight,
+//                          Snake::Direction::kLeft);
               ChangeHeading(snake, snake.turnSpeed * std::pow(1.05, snake.size()));
           break;
 

@@ -3,16 +3,49 @@
 //
 
 #include "food.h"
+#include <iostream>
 
-Food::Food(int x, int y) : x(x), y(y), type(REGULAR), engine(dev()), random_type(0, static_cast<int>(4)) { }
+Food::Food(int x, int y) : x(x), y(y) {
+    std::random_device dev;
+    std::mt19937 engine(dev());
+    std::uniform_int_distribution<int> random_type(0, 3);
 
-Food::Food(const Food& other) : x(other.x), y(other.y), type(other.type), engine(other.engine), random_type(0, static_cast<int>(4)) { }
+    _type = static_cast<Type>( random_type(engine));
+}
+
+Food::Food(int x, int y, Type type) : x(x), y(y), _type(type) { }
+
+Food::Food(const Food& other) : x(other.x), y(other.y) { }
 
 Food &Food::operator=(const Food &other) {
     x = other.x;
     y = other.y;
-    type = other.type;
-    engine = other.engine;
-    random_type = other.random_type;
+    _type = other._type;
     return *this;
+}
+
+float Food::energy() const {
+    switch (_type) {
+        case Type::REGULAR:
+            return 1;
+        case Type::SPECIAL:
+            return 5;
+        case Type::SMALL:
+            return 1;
+        case Type::BIG:
+            return 0;
+    }
+}
+
+float Food::size() const {
+    switch (_type) {
+        case Type::REGULAR:
+            return 10;
+        case Type::SPECIAL:
+            return 5;
+        case Type::SMALL:
+            return 1;
+        case Type::BIG:
+            return 15;
+    }
 }

@@ -44,16 +44,24 @@ void Renderer::Render(Snake const &snake, std::vector<Food> &food) {
     SDL_RenderClear(sdl_renderer);
 
     // Render Food
-    const std::size_t food_size = 10;
+//    const std::size_t food_size = 10;
 
     {
         SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xCC, 0x00, 0xFF);
 
         for (Food const &fd: food) {
             auto center = render_coordinates(fd.x, fd.y);
-
-//    fillRect(sdl_renderer, center, food_size, food_size);
-            fillCircle(sdl_renderer, center, food_size / 2);
+            switch (fd.type()) {
+                case Food::Type::REGULAR:
+                    fillCircle(sdl_renderer, center, fd.size() / 2);
+                    break;
+                case Food::Type::SPECIAL:
+                    fillRect(sdl_renderer, center, fd.size(), fd.size());
+                    break;
+                default:
+                    drawRect(sdl_renderer, center, fd.size(), fd.size());
+                    break;
+            }
         }
     }
 
@@ -119,6 +127,11 @@ void Renderer::fillCircle(SDL_Renderer* renderer, SDL_Point center, int32_t radi
 void Renderer::fillRect(SDL_Renderer *renderer, SDL_Point center, int32_t width, int32_t height) {
     SDL_Rect glyph {center.x - width / 2, center.y - height / 2, width, height};
     SDL_RenderFillRect(sdl_renderer, &glyph);
+}
+
+void Renderer::drawRect(SDL_Renderer *renderer, SDL_Point center, int32_t width, int32_t height) {
+    SDL_Rect glyph {center.x - width / 2, center.y - height / 2, width, height};
+    SDL_RenderDrawRect(sdl_renderer, &glyph);
 }
 
 //void Renderer::fillRect(SDL_Renderer *renderer, SDL_Rect &glyph) {
