@@ -27,7 +27,7 @@ void Snake::UpdateBody() {
             addBodySegment(coordinate{x, y}, heading.x, heading.y);
             growing = false;
         } else if (body.size() == 1){
-            addBodySegment(coordinate {x, y}, body[0]);
+            addBodySegment(body[0], coordinate {x, y});
             growing = false;
         } else {
             addBodySegment(body.back(), body[body.size() - 2]);
