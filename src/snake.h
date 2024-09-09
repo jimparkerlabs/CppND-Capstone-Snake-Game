@@ -8,9 +8,10 @@ class Snake : public WorldObject {
 public:
     Snake(int grid_width, int grid_height)
             : WorldObject(grid_width, grid_height) {
-        heading = coordinate{0.0f, -1.0f};
-        speed = 1.0f;
-        turnSpeed = M_PI / 18.0f;
+        _heading = coordinate{0.0f, -1.0f};
+        _speed = 1.0f;
+        _energy = 100.0f,
+        _size = 15;
     }
 
     // overrides of inherited attributes
@@ -21,9 +22,9 @@ public:
     void GrowBody();
     int numSegments() const {return body.size() + 1;};
 
-    const std::size_t segment_size = 10;
-    const std::size_t head_size = 12;
-    const std::size_t segment_separation = segment_size;
+    const float segment_size = 10.0f;
+//    const float head_size = _size;
+    const float segment_separation = segment_size;
 
     bool alive{true};
 

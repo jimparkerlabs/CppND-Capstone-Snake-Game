@@ -5,7 +5,7 @@
 #include "food.h"
 #include <iostream>
 
-Food::Food(int x, int y) : x(x), y(y) {
+Food::Food(int x, int y) : WorldObject(x, y)/*, WorldObject(grid_width, grid_height)*/ {
     std::random_device dev;
     std::mt19937 engine(dev());
     std::uniform_int_distribution<int> random_type(0, 3);
@@ -16,13 +16,13 @@ Food::Food(int x, int y) : x(x), y(y) {
     _type = static_cast<Type>(rando);
 }
 
-Food::Food(int x, int y, Type type) : x(x), y(y), _type(type) { }
+Food::Food(int x, int y, Type type) : WorldObject(x, y), _type(type)/*, WorldObject(grid_width, grid_height)*/ { }
 
-Food::Food(const Food& other) : x(other.x), y(other.y) { }
+Food::Food(const Food& other) : WorldObject(other.position().x, other.position().y), _type(other._type)/*, WorldObject(grid_width, grid_height)*/ { }
 
 Food &Food::operator=(const Food &other) {
-    x = other.x;
-    y = other.y;
+    _position.x = other.position().x;
+    _position.y = other.position().y;
     _type = other._type;
     return *this;
 }

@@ -7,13 +7,13 @@ void Snake::Update() {
     UpdateBody();
 
     // wrap segments if necessary
-    x = fmod(x + grid_width, grid_width);
-    y = fmod(y + grid_height, grid_height);
+//    _position.x = fmod(_position.x + grid_width, grid_width);
+//    _position.y = fmod(_position.y + grid_height, grid_height);
 
     // iterate over body and do the same
     for (Snake::coordinate &point : body) {
-        point.x = fmod(point.x + grid_width, grid_width);
-        point.y = fmod(point.y + grid_height, grid_height);
+//        point.x = fmod(point.x + grid_width, grid_width);
+//        point.y = fmod(point.y + grid_height, grid_height);
     }
 }
 
@@ -24,10 +24,10 @@ void Snake::UpdateHead() {
 void Snake::UpdateBody() {
     if (growing) {
         if (body.empty()) {
-            addBodySegment(coordinate{x, y}, heading.x, heading.y);
+            addBodySegment(_position, _heading.x, _heading.y);
             growing = false;
         } else if (body.size() == 1){
-            addBodySegment(coordinate {x, y}, body[0]);
+            addBodySegment(_position, body[0]);
             growing = false;
         } else {
             addBodySegment(body.back(), body[body.size() - 2]);
@@ -37,7 +37,7 @@ void Snake::UpdateBody() {
 
     if (!body.empty()) {
         // move first body segment
-        body[0] = moveBody(body[0], Snake::coordinate{x, y});
+        body[0] = moveBody(body[0], Snake::_position);
     }
 
     for (std::size_t i = 1; i < body.size(); ++i) {
@@ -47,7 +47,7 @@ void Snake::UpdateBody() {
     // Check if the snake has died
     // TODO: change this to cut the snake
     for (auto const &item : body) {
-        if (x == item.x && y == item.y) {
+        if (_position.x == item.x && _position.y == item.y) {
             alive = false;
             std::cout << "You are dead!" << std::endl;
             alive = true;
@@ -60,7 +60,7 @@ void Snake::addBodySegment(const coordinate &ref1, const coordinate &ref2) {
     auto [newBearing_x, newBearing_y] = getBearing(ref1, ref2);
     addBodySegment(ref1, newBearing_x, newBearing_y);
 //    body.push_back(SDL_Point{static_cast<int>(body.back().x - new_bearing.x * segment_separation),
-//                             static_cast<int>(body.back().y - new_bearing.y * segment_separation)});
+//                             static_cast<int>(body.back()._y - new_bearing._y * segment_separation)});
     //numSegments++;
 }
 
@@ -73,25 +73,25 @@ void Snake::GrowBody() { growing = true; }
 
 // Inefficient method to check if cell is occupied by snake.
 bool Snake::isOccupying(const coordinate &point) const {
-  if (point.x == x && point.y == y) {
-    return true;
-  }
-  for (auto const &item : body) {
-    if (point.x == item.x && point.y == item.y) {
-      return true;
+    if (WorldObject::isOccupying(point)) return true;
+
+    // check for the body
+    for (auto const &segment : body) {
+        if (point.x == segment.x && point.y == segment.y) {
+            return true;
+        }
     }
-  }
-  return false;
+    return false;
 }
 
 //void Snake::move() {
-//    x += (speed * std::pow(1.05, body.size()) * heading.x);
-//    y += (speed * std::pow(1.05, body.size()) * heading.y);
+//    x += (_speed * std::pow(1.05, body.size()) * _heading.x);
+//    _y += (_speed * std::pow(1.05, body.size()) * _heading._y);
 //}
 
 //void Snake::move() {
-//    x += (speed * heading.x);
-//    y += (speed * heading.y);
+//    x += (_speed * _heading.x);
+//    _y += (_speed * _heading._y);
 //}
 
 Snake::coordinate Snake::moveBody(const coordinate &point, const coordinate &toward) {

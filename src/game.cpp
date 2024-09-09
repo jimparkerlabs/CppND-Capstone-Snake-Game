@@ -36,7 +36,7 @@ void Game::Run(Controller const &controller, Renderer &renderer,
 
     // After every second, update the window title.
     if (frame_end - title_timestamp >= 1000) {
-      renderer.UpdateWindowTitle(score, frame_count);
+      renderer.UpdateWindowTitle(score, frame_count, snake.energy());
       frame_count = 0;
       title_timestamp = frame_end;
     }
@@ -69,16 +69,16 @@ void Game::Update() {
     snake.Update();
 
 //    int new_x = static_cast<int>(snake.x);
-//    int new_y = static_cast<int>(snake.y);
+//    int new_y = static_cast<int>(snake._y);
 
     // Check if there's Food over here
     for (size_t i = 0; i < food.size(); ++i) {
         if (gotFood(food[i])) {
             score+= static_cast<int>(food[i].energy());
             food.erase(food.begin() + i);
-            // Grow snake and increase speed.
+            // Grow snake and increase _speed.
             snake.GrowBody();
-            snake.speed *= 1.05;
+            snake.adjustSpeed(snake.speed() * 0.05);
             PlaceFood();
             break;  // can only be one Food item here
         }
@@ -86,9 +86,7 @@ void Game::Update() {
 }
 
 bool Game::gotFood(Food &fd) const {
-    // retrun true if Food x and y are inside the rectangle centered at snake.x and snake.y with sides = snake.head_size
-    return (fd.x >= snake.x - snake.head_size / 2 && fd.x <= snake.x + snake.head_size / 2 &&
-            fd.y >= snake.y - snake.head_size / 2 && fd.y <= snake.y + snake.head_size / 2);
+    return snake.isOccupying(fd.position()) || fd.isOccupying(snake.position());
 }
 
 int Game::GetScore() const { return score; }

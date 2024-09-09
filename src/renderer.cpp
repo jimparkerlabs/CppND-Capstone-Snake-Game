@@ -44,57 +44,43 @@ void Renderer::Render(Snake const &snake, std::vector<Food> &food) {
     SDL_RenderClear(sdl_renderer);
 
     // Render Food
-//    const std::size_t food_size = 10;
+    SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xCC, 0x00, 0xFF);
 
-    {
-        SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xCC, 0x00, 0xFF);
-
-        for (Food const &fd: food) {
-            auto center = render_coordinates(fd.x, fd.y);
-            switch (fd.type()) {
-                case Food::Type::REGULAR:
-                    fillCircle(sdl_renderer, center, fd.size() / 2);
-                    break;
-                case Food::Type::SPECIAL:
-                    fillRect(sdl_renderer, center, fd.size(), fd.size());
-                    break;
-                default:
-                    drawRect(sdl_renderer, center, fd.size(), fd.size());
-                    break;
-            }
+    for (Food const &fd: food) {
+        switch (fd.type()) {
+            case Food::Type::REGULAR:
+                fillCircle(sdl_renderer, render_coordinates(fd.position()), worldToScreen(fd.size() / 2));
+                break;
+            case Food::Type::SPECIAL:
+                fillRect(sdl_renderer, render_coordinates(fd.position()), worldToScreen(fd.size()), worldToScreen(fd.size()));
+                break;
+            default:
+                drawRect(sdl_renderer, render_coordinates(fd.position()), worldToScreen(fd.size()), worldToScreen(fd.size()));
         }
     }
 
     // Render snake body
-    // TODO: allow various head shapes, segment shapes, and segment separations
-    {
-//        int segmentRenderWidth = gridToScreen_x(snake.segment_size);
-//        int segmentRenderHeight = gridToScreen_y(snake.segment_size);
-        SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-        for (Snake::coordinate const &point: snake.body) {
-            SDL_Point center = render_coordinates(point);
-            fillCircle(sdl_renderer, center, gridToScreen_x(snake.segment_size / 2));
-        }
+    SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+
+    for (Snake::coordinate const &point: snake.body) {
+        fillCircle(sdl_renderer, render_coordinates(point), gridToScreen_x(snake.segment_size / 2));
     }
 
     // Render snake's head
-    {
-        if (snake.alive) {
-            SDL_SetRenderDrawColor(sdl_renderer, 0x00, 0x7A, 0xCC, 0xFF);
-        } else {
-            SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x00, 0x00, 0xFF);
-        }
-
-        SDL_Point render_point = render_coordinates(snake.x, snake.y);
-
-        fillCircle(sdl_renderer, render_point, gridToScreen_x(snake.head_size / 2));
+    if (snake.alive) {
+        SDL_SetRenderDrawColor(sdl_renderer, 0x00, 0x7A, 0xCC, 0xFF);
+    } else {
+        SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x00, 0x00, 0xFF);
     }
+
+    fillCircle(sdl_renderer, render_coordinates(snake.position()), gridToScreen_x(snake.size() / 2));
+
     // Update Screen
     SDL_RenderPresent(sdl_renderer);
 }
 
-void Renderer::UpdateWindowTitle(int score, int fps) {
-  std::string title{"Snake Score: " + std::to_string(score) + " FPS: " + std::to_string(fps)};
+void Renderer::UpdateWindowTitle(int score, int fps, float energy) {
+  std::string title{"Snake Energy: " + std::to_string(static_cast<int>(energy)) + " Score: " + std::to_string(score) + " FPS: " + std::to_string(fps)};
   SDL_SetWindowTitle(sdl_window, title.c_str());
 }
 
@@ -104,6 +90,10 @@ void Renderer::UpdateWindowTitle(int score, int fps) {
 
 SDL_Point Renderer::render_coordinates(float grid_x, float grid_y) {
     return SDL_Point {static_cast<int>(grid_x  / grid_width * screen_width), static_cast<int>(grid_y / grid_height * screen_height)};
+}
+
+int Renderer::worldToScreen(float const coord) {
+    return static_cast<int>(coord  / grid_width * screen_width);
 }
 
 SDL_Point Renderer::render_coordinates(Snake::coordinate point) {

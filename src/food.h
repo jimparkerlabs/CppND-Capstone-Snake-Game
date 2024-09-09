@@ -2,12 +2,14 @@
 // Created by Jim Parker on 9/5/24.
 //
 
+#include "WorldObject.h"
+
 #ifndef SDL2TEST_FOOD_H
 #define SDL2TEST_FOOD_H
 
 #include <random>
 
-class Food {
+class Food : public WorldObject {
 public:
     enum class Type { REGULAR, SPECIAL, BIG, SMALL };
 
@@ -17,12 +19,12 @@ public:
     Food(const Food& other);
     Food& operator=(const Food & other);
 
-    int x;
-    int y;
+    float size()  const override;
+    float energy() const override;
+    bool isOccupying(const coordinate &point) const override {return false;};
+    void Update() override {};
 
     Type type() const {return _type;};
-    float energy() const;
-    float size() const;
 
 private:
     Type _type {Type::REGULAR};

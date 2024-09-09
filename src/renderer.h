@@ -13,7 +13,7 @@ class Renderer {
     ~Renderer();
 
     void Render(Snake const &snake, std::vector<Food> &food);
-    void UpdateWindowTitle(int score, int fps);
+    void UpdateWindowTitle(int score, int fps, float energy);
 
  private:
     SDL_Window *sdl_window;
@@ -34,6 +34,7 @@ class Renderer {
     void fillCircle(SDL_Renderer* renderer, SDL_Point center, int32_t radius);
     void fillRect(SDL_Renderer* renderer, SDL_Point center, int32_t width, int32_t height);
     void drawRect(SDL_Renderer* renderer, SDL_Point center, int32_t width, int32_t height);
+    int worldToScreen(float const coord);
 //    void fillRect(SDL_Renderer* renderer, SDL_Rect &glyph);
 };
 
