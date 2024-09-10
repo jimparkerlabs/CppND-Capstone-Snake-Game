@@ -87,7 +87,7 @@ Snake::coordinate Snake::moveBody(const coordinate &point, const coordinate &tow
     return coordinate {toward.x - (segment_separation * bearing_x), toward.y - (segment_separation * bearing_y)};
 }
 
-void Snake::eat(Food *obj) {
+void Snake::eat(WorldObject *obj) {
     obj->alive = false;
 
     if (alive) {
@@ -101,11 +101,14 @@ void Snake::eat(Snake *obj) {
     adjustEnergy(1);
 }
 
-void Snake::truncateAt(size_t index) {
+std::vector<Snake::coordinate> Snake::truncateAt(size_t index) {
     // remove all elements from body vector after index
-    if (index < body.size())
+    auto ret = std::vector<coordinate>(body.begin() + index, body.end());
+
+    if (index < body.size()) {
+        _energy *= (index + 1.0f) / body.size();
         body.erase(body.begin() + index, body.end());
-    // TODO: reduce energy
-    _energy *= (index - 1.0f) / body.size();
+    }
+    return ret;
 }
 

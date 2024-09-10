@@ -6,6 +6,7 @@
 
 #include "snake.h"
 #include "food.h"
+#include "SnakePart.h"
 
 class Renderer {
  public:

@@ -31,7 +31,7 @@ private:
     const int numFoodToPlace = 6;
     int score{0};
 
-    bool gotFood(const Snake *snake, const Food *fd) const;
+    bool gotFood(const Snake *snake, const WorldObject *fd) const;
     bool visible(const WorldObject* const obj);
 
     void PlaceFood();

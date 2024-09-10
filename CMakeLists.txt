@@ -18,6 +18,8 @@ add_executable(SnakeGame src/main.cpp src/game.cpp src/controller.cpp src/render
         src/food.cpp
         src/food.h
         src/WorldObject.cpp
-        src/WorldObject.h)
+        src/WorldObject.h
+        src/SnakePart.cpp
+        src/SnakePart.h)
 string(STRIP ${SDL2_LIBRARIES} SDL2_LIBRARIES)
 target_link_libraries(SnakeGame ${SDL2_LIBRARIES})

@@ -5,7 +5,7 @@
 #include "food.h"
 #include <iostream>
 
-Food::Food(int x, int y) : WorldObject(x, y) {
+Food::Food(float x, float y) : WorldObject(x, y) {
     std::random_device dev;
     std::mt19937 engine(dev());
     std::uniform_int_distribution<int> random_type(0, 3);
@@ -16,7 +16,7 @@ Food::Food(int x, int y) : WorldObject(x, y) {
     setUpType();
 }
 
-Food::Food(int x, int y, Type type) : WorldObject(x, y), _type(type) {
+Food::Food(float x, float y, Type type) : WorldObject(x, y), _type(type) {
     setUpType();
 }
 

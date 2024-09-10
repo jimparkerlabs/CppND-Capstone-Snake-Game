@@ -9,8 +9,8 @@ class Snake : public WorldObject {
 public:
     enum class Type { PLAYER, BLUE, RED };
 
-    Snake(int grid_width, int grid_height)
-            : WorldObject(grid_width, grid_height) {
+    Snake(float x, float y)
+            : WorldObject(x, x) {
         _heading = coordinate{0.0f, -1.0f};
         _speed = 1.0f;
         _energy = 100.0f,
@@ -22,10 +22,10 @@ public:
     bool headShot(const coordinate &point) const { return WorldObject::isOccupying(point);}
     size_t bodyShot(const coordinate &point) const;
 
-    void eat(Food *obj);
+    void eat(WorldObject *obj);
     void eat(Snake *obj);
 
-    void truncateAt(size_t index);
+    std::vector<coordinate> truncateAt(size_t index);
 
     // player-specific functionality
     void GrowBody();

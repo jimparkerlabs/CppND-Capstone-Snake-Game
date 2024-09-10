@@ -7,7 +7,7 @@ Game::Game(std::size_t grid_width, std::size_t grid_height)
       random_w(0, static_cast<int>(grid_width - 1)),
       random_h(0, static_cast<int>(grid_height - 1)) {
 
-    gameObjects.emplace_back(std::make_unique<Snake>(grid_width, grid_height));
+    gameObjects.emplace_back(std::make_unique<Snake>(grid_width / 2.0f, grid_height / 2.0f));
   PlaceFood();
 }
 
@@ -79,10 +79,22 @@ void Game::Update() {
 
     auto food = filter<Food>(gameObjects);
     auto snakes = filter<Snake>(gameObjects);
+    auto snakeParts = filter<SnakePart>(gameObjects);
 
     // Check if any snakes got any food
     for (auto snake : snakes) {
         for (auto fd: food) {
+            if (gotFood(snake, fd)) {
+                score += static_cast<int>(fd->energy());
+                snake->eat(fd);
+                break;  // can only be one Food item here
+            }
+        }
+    }
+
+    // Check if any snakes got any snake parts
+    for (auto snake : snakes) {
+        for (auto fd: snakeParts) {
             if (gotFood(snake, fd)) {
                 score += static_cast<int>(fd->energy());
                 snake->eat(fd);
@@ -98,8 +110,12 @@ void Game::Update() {
                 // snake1 got snake2
                 std::cout << "index: " << index << std::endl;
                 snake1->eat(snake2);
-                // TODO: cut snake2
-                snake2->truncateAt(index);
+                // cut snake2
+                auto coords = snake2->truncateAt(index - 1);
+                std::cout << coords.size() << std::endl;
+                for (auto coord: coords) {
+                    gameObjects.emplace_back(std::make_unique<SnakePart>(coord.x, coord.y));
+                }
             }
         }
     }
@@ -113,7 +129,7 @@ void Game::Update() {
     PlaceFood();
 }
 
-bool Game::gotFood(const Snake *snake, const Food *const fd) const {
+bool Game::gotFood(const Snake *snake, const WorldObject *const fd) const {
 //    const Snake &player = *dynamic_cast<Snake*>(gameObjects[0].get());
     return snake->headShot(fd->position()) || fd->isOccupying(snake->position());
 }

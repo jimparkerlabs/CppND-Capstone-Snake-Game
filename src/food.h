@@ -13,16 +13,13 @@ class Food : public WorldObject {
 public:
     enum class Type { REGULAR, SPECIAL, BIG, SMALL };
 
-    Food(int x, int y);
-    Food(int x, int y, Type type);
+    Food(float x, float y);
+    Food(float x, float y, Type type);
 
     Food(const Food& other);
     Food& operator=(const Food & other);
 
     void setUpType();
-//    float size()  const override;
-//    float speed()  const override;
-//    float energy() const override;
     bool isOccupying(const coordinate &point) const override {return false;};
 
     Type type() const {return _type;};

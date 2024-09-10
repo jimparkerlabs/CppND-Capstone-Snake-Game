@@ -81,6 +81,12 @@ void Renderer::Render(std::vector<std::unique_ptr<WorldObject>> &objects) {
                 fillCircle(sdl_renderer, render_coordinates(point), gridToScreen_x(snake->segment_size / 2));
             }
         }
+        // SnakeParts
+        else if(auto* snakePart = dynamic_cast<SnakePart*>(obj.get())) {
+//            std::cout << "snake part energy " << std::hex << static_cast<unsigned int>(snakePart->energy() * 256) << std::dec << std::endl;
+            SDL_SetRenderDrawColor(sdl_renderer, 0x00, 0xFF, 0x00, static_cast<unsigned int>(snakePart->energy() * 256));
+            fillCircle(sdl_renderer, render_coordinates(snakePart->position()), gridToScreen_x(snakePart->size() / 2));
+        }
     }
 
     // Update Screen

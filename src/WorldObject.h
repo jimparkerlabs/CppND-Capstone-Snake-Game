@@ -15,10 +15,8 @@ public:
         float y;
     };
 
-    WorldObject(int grid_width, int grid_height) :
-//              grid_width(grid_width),
-//              grid_height(grid_height),
-            _position({grid_width / 2.0f, grid_height / 2.0f}) {}
+//    WorldObject(int grid_width, int grid_height) :
+//            _position({grid_width / 2.0f, grid_height / 2.0f}) {}
 
     WorldObject(float x, float y) :
             _position({x, y}) {}
