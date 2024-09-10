@@ -74,8 +74,21 @@ void Game::Update() {
 
     if (!player.alive) return;
 
-    for (auto &obj : gameObjects)
+    for (auto &obj : gameObjects) {
         obj->Update();
+
+        // bounce gameObjects that ran off the screen
+        if (obj->position().x > 100) {
+            // bounce left
+        } else if (obj->position().x < 0) {
+            // bounce right
+        } else if (obj->position().y < 0) {
+            // bounce down
+        } else if (obj->position().y > 100) {
+            // bounce up
+        }
+    }
+
 
     auto food = filter<Food>(gameObjects);
     auto snakes = filter<Snake>(gameObjects);

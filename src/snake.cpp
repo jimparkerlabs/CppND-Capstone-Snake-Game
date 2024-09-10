@@ -8,16 +8,6 @@ void Snake::Update() {
     UpdateHead();
     UpdateBody();
     _energy -= 1.0 / 60.0f;  // TODO: some multiple of speed
-
-    // wrap segments if necessary
-//    x = fmod(x + grid_width, grid_width);
-//    y = fmod(y + grid_height, grid_height);
-
-    // iterate over body and do the same
-    for (Snake::coordinate &point : body) {
-//        point.x = fmod(point.x + grid_width, grid_width);
-//        point.y = fmod(point.y + grid_height, grid_height);
-    }
 }
 
 void Snake::UpdateHead() {
