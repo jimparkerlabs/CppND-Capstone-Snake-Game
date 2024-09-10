@@ -23,7 +23,11 @@ public:
     WorldObject(float x, float y) :
             _position({x, y}) {}
 
+    virtual ~WorldObject() {};
+
     virtual coordinate position() const {return _position;}
+
+    bool alive{true};
 
     virtual float energy() const {return _energy;}
     virtual void adjustEnergy(float deltaEnergy);
@@ -37,8 +41,10 @@ public:
     virtual float size() const {return _size;}
     virtual bool isOccupying(const coordinate &point) const;
 
+//    int type{0};
+
     virtual void move();
-    virtual void Update() = 0;
+    virtual void Update();
 
 protected:
     coordinate _position;

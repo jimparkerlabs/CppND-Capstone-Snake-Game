@@ -7,6 +7,7 @@
 #include "renderer.h"
 #include "snake.h"
 #include "food.h"
+#include "WorldObject.h"
 
 class Game {
 public:
@@ -18,8 +19,7 @@ public:
 
 private:
     // TODO: vector of gameObjects
-    Snake snake;
-    std::vector<Food> food;
+    std::vector<std::unique_ptr<WorldObject>> gameObjects;
 
     std::random_device dev;
     std::mt19937 engine;
@@ -31,10 +31,14 @@ private:
     const int numFoodToPlace = 6;
     int score{0};
 
-    bool gotFood(Food &fd) const;
+    bool gotFood(const Snake *snake, const Food *fd) const;
+    bool visible(const WorldObject* const obj);
 
     void PlaceFood();
     void Update();
+
+    template <typename T>
+    std::vector<T*> filter(const std::vector<std::unique_ptr<WorldObject>>& objects);
 };
 
 #endif

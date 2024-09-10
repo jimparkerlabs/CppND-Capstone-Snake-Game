@@ -38,46 +38,97 @@ Renderer::~Renderer() {
   SDL_Quit();
 }
 
-void Renderer::Render(Snake const &snake, std::vector<Food> &food) {
+void Renderer::Render(std::vector<std::unique_ptr<WorldObject>> &objects) {
     // Clear screen
     SDL_SetRenderDrawColor(sdl_renderer, 0x1E, 0x1E, 0x1E, 0xFF);
     SDL_RenderClear(sdl_renderer);
 
-    // Render Food
-    SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xCC, 0x00, 0xFF);
+    // render gameObjects
+    for (auto const &obj: objects) {
+        // Food
+        if(auto* fd = dynamic_cast<Food*>(obj.get())) {
+            switch (fd->type()) {
+                case Food::Type::REGULAR:
+                    SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xCC, 0x00, 0xFF);
+                    fillCircle(sdl_renderer, render_coordinates(fd->position()), worldToScreen(fd->size() / 2));
+                    break;
+                case Food::Type::SPECIAL:
+                    SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xCC, 0x00, 0xFF);
+                    fillRect(sdl_renderer, render_coordinates(fd->position()), worldToScreen(fd->size()),
+                             worldToScreen(fd->size()));
+                    break;
+                default:
+                    SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xCC, 0x00, 0xFF);
+                    drawRect(sdl_renderer, render_coordinates(fd->position()), worldToScreen(fd->size()),
+                             worldToScreen(fd->size()));
+            }
+        }
+        // Snakes
+        else if(auto* snake = dynamic_cast<Snake*>(obj.get())) {
+            // Render head
+            if (snake->alive) {
+                SDL_SetRenderDrawColor(sdl_renderer, 0x00, 0x7A, 0xCC, 0xFF);
+            } else {
+                SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x00, 0x00, 0xFF);
+            }
 
-    for (Food const &fd: food) {
-        switch (fd.type()) {
-            case Food::Type::REGULAR:
-                fillCircle(sdl_renderer, render_coordinates(fd.position()), worldToScreen(fd.size() / 2));
-                break;
-            case Food::Type::SPECIAL:
-                fillRect(sdl_renderer, render_coordinates(fd.position()), worldToScreen(fd.size()), worldToScreen(fd.size()));
-                break;
-            default:
-                drawRect(sdl_renderer, render_coordinates(fd.position()), worldToScreen(fd.size()), worldToScreen(fd.size()));
+            fillCircle(sdl_renderer, render_coordinates(snake->position()), gridToScreen_x(snake->size() / 2));
+
+            // Render body
+            SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+
+            for (Snake::coordinate const &point: snake->body) {
+                fillCircle(sdl_renderer, render_coordinates(point), gridToScreen_x(snake->segment_size / 2));
+            }
         }
     }
 
-    // Render snake body
-    SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-
-    for (Snake::coordinate const &point: snake.body) {
-        fillCircle(sdl_renderer, render_coordinates(point), gridToScreen_x(snake.segment_size / 2));
-    }
-
-    // Render snake's head
-    if (snake.alive) {
-        SDL_SetRenderDrawColor(sdl_renderer, 0x00, 0x7A, 0xCC, 0xFF);
-    } else {
-        SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x00, 0x00, 0xFF);
-    }
-
-    fillCircle(sdl_renderer, render_coordinates(snake.position()), gridToScreen_x(snake.size() / 2));
-
     // Update Screen
     SDL_RenderPresent(sdl_renderer);
+
 }
+
+
+//void Renderer::Render(Snake const &snake, std::vector<Food> &food) {
+//    // Clear screen
+//    SDL_SetRenderDrawColor(sdl_renderer, 0x1E, 0x1E, 0x1E, 0xFF);
+//    SDL_RenderClear(sdl_renderer);
+//
+//    // Render Food
+//    SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xCC, 0x00, 0xFF);
+//
+//    for (Food const &fd: food) {
+//        switch (fd.type()) {
+//            case Food::Type::REGULAR:
+//                fillCircle(sdl_renderer, render_coordinates(fd.position()), worldToScreen(fd.size() / 2));
+//                break;
+//            case Food::Type::SPECIAL:
+//                fillRect(sdl_renderer, render_coordinates(fd.position()), worldToScreen(fd.size()), worldToScreen(fd.size()));
+//                break;
+//            default:
+//                drawRect(sdl_renderer, render_coordinates(fd.position()), worldToScreen(fd.size()), worldToScreen(fd.size()));
+//        }
+//    }
+//
+//    // Render player body
+//    SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+//
+//    for (Snake::coordinate const &point: snake.body) {
+//        fillCircle(sdl_renderer, render_coordinates(point), gridToScreen_x(snake.segment_size / 2));
+//    }
+//
+//    // Render player's head
+//    if (snake.alive) {
+//        SDL_SetRenderDrawColor(sdl_renderer, 0x00, 0x7A, 0xCC, 0xFF);
+//    } else {
+//        SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x00, 0x00, 0xFF);
+//    }
+//
+//    fillCircle(sdl_renderer, render_coordinates(snake.position()), gridToScreen_x(snake.size() / 2));
+//
+//    // Update Screen
+//    SDL_RenderPresent(sdl_renderer);
+//}
 
 void Renderer::UpdateWindowTitle(int score, int fps, float energy) {
   std::string title{"Snake Energy: " + std::to_string(static_cast<int>(energy)) + " Score: " + std::to_string(score) + " FPS: " + std::to_string(fps)};

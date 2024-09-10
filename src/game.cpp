@@ -3,10 +3,11 @@
 #include "SDL.h"
 
 Game::Game(std::size_t grid_width, std::size_t grid_height)
-    : snake(grid_width, grid_height),
-      engine(dev()),
+    : engine(dev()),
       random_w(0, static_cast<int>(grid_width - 1)),
       random_h(0, static_cast<int>(grid_height - 1)) {
+
+    gameObjects.emplace_back(std::make_unique<Snake>(grid_width, grid_height));
   PlaceFood();
 }
 
@@ -18,14 +19,16 @@ void Game::Run(Controller const &controller, Renderer &renderer,
   Uint32 frame_duration;
   int frame_count = 0;
   bool running = true;
+  Snake &player = *dynamic_cast<Snake*>(gameObjects[0].get());  // should check to make sure !gameObjects.empty()
 
   while (running) {
     frame_start = SDL_GetTicks();
 
     // Input, Update, Render - the main game loop.
-    controller.HandleInput(running, snake);
+    controller.HandleInput(running, player);
     Update();
-    renderer.Render(snake, food);
+//    renderer.Render(player, food);
+      renderer.Render(gameObjects);
 
     frame_end = SDL_GetTicks();
 
@@ -36,7 +39,7 @@ void Game::Run(Controller const &controller, Renderer &renderer,
 
     // After every second, update the window title.
     if (frame_end - title_timestamp >= 1000) {
-      renderer.UpdateWindowTitle(score, frame_count, snake.energy());
+      renderer.UpdateWindowTitle(score, frame_count, player.energy());
       frame_count = 0;
       title_timestamp = frame_end;
     }
@@ -51,43 +54,84 @@ void Game::Run(Controller const &controller, Renderer &renderer,
 }
 
 void Game::PlaceFood() {
-  float x, y;
-  while (food.size() < numFoodToPlace) {
-    x = random_w(engine);
-    y = random_h(engine);
-    // Check that the location is not occupied by a snake item before placing Food.
-    if (!snake.isOccupying(WorldObject::coordinate {x, y})) {
-      food.emplace_back(x, y);
-    }
-//    std::cout << static_cast<int>(food.back().type()) << std::endl;
-  }
-}
+    const Snake &player = *dynamic_cast<Snake*>(gameObjects[0].get());
+    float x, y;
 
-void Game::Update() {
-    if (!snake.alive) return;
-
-    snake.Update();
-
-//    int new_x = static_cast<int>(snake.x);
-//    int new_y = static_cast<int>(snake._y);
-
-    // Check if there's Food over here
-    for (size_t i = 0; i < food.size(); ++i) {
-        if (gotFood(food[i])) {
-            score+= static_cast<int>(food[i].energy());
-            food.erase(food.begin() + i);
-            // Grow snake and increase _speed.
-            snake.GrowBody();
-            snake.adjustSpeed(snake.speed() * 0.05);
-            PlaceFood();
-            break;  // can only be one Food item here
+    while (filter<Food>(gameObjects).size() < numFoodToPlace) {
+        x = random_w(engine);
+        y = random_h(engine);
+        // Check that the location is not occupied by a player item before placing Food.
+        if (!player.isOccupying(WorldObject::coordinate {x, y})) {
+            gameObjects.emplace_back(std::make_unique<Food>(x, y));
         }
     }
 }
 
-bool Game::gotFood(Food &fd) const {
-    return snake.isOccupying(fd.position()) || fd.isOccupying(snake.position());
+void Game::Update() {
+    Snake &player = *dynamic_cast<Snake*>(gameObjects[0].get());
+
+    if (player.energy() <= 0.0f) player.alive = false;
+
+    if (!player.alive) return;
+
+    for (auto &obj : gameObjects)
+        obj->Update();
+
+    auto food = filter<Food>(gameObjects);
+    auto snakes = filter<Snake>(gameObjects);
+
+    // Check if any snakes got any food
+    for (auto snake : snakes) {
+        for (auto fd: food) {
+            if (gotFood(snake, fd)) {
+                score += static_cast<int>(fd->energy());
+                snake->eat(fd);
+                break;  // can only be one Food item here
+            }
+        }
+    }
+
+    // TODO: check if any snakes got "got"
+    for (auto snake1 : snakes) {
+        for (auto snake2 : snakes) {
+            if (size_t index = snake2->bodyShot(snake1->position())) {
+                // snake1 got snake2
+                std::cout << "index: " << index << std::endl;
+                snake1->eat(snake2);
+                // TODO: cut snake2
+                snake2->truncateAt(index);
+            }
+        }
+    }
+
+    // TODO: remove "dead" food and objects off the screen and handle dead snakes
+    gameObjects.erase(
+            std::remove_if(gameObjects.begin(), gameObjects.end(), [this](const std::unique_ptr<WorldObject> &obj) {
+                return !obj->alive || !visible(obj.get());
+            }), gameObjects.end());
+
+    PlaceFood();
+}
+
+bool Game::gotFood(const Snake *snake, const Food *const fd) const {
+//    const Snake &player = *dynamic_cast<Snake*>(gameObjects[0].get());
+    return snake->headShot(fd->position()) || fd->isOccupying(snake->position());
+}
+
+bool Game::visible(const WorldObject* const obj) {
+    return true;
 }
 
 int Game::GetScore() const { return score; }
-int Game::GetSize() const { return snake.numSegments(); }
+int Game::GetSize() const { return (*dynamic_cast<Snake*>(gameObjects[0].get())).numSegments(); }
+
+template <typename T>
+std::vector<T*> Game::filter(const std::vector<std::unique_ptr<WorldObject>>& objects) {
+    std::vector<T*> result;
+    for(const std::unique_ptr<WorldObject>& obj : objects) {
+        if(auto* subClassObj = dynamic_cast<T*>(obj.get())) {
+            result.push_back(subClassObj);
+        }
+    }
+    return result;
+}

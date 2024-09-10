@@ -19,10 +19,11 @@ public:
     Food(const Food& other);
     Food& operator=(const Food & other);
 
-    float size()  const override;
-    float energy() const override;
+    void setUpType();
+//    float size()  const override;
+//    float speed()  const override;
+//    float energy() const override;
     bool isOccupying(const coordinate &point) const override {return false;};
-    void Update() override {};
 
     Type type() const {return _type;};
 

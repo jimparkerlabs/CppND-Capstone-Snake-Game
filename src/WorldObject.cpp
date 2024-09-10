@@ -17,9 +17,13 @@ std::pair<float, float> WorldObject::getBearing(const coordinate &from, const co
 }
 
 void WorldObject::move() {
-    std::cout << _heading.x << " " << _heading.y << std::endl;
+//    std::cout << "heading: " << _heading.x << " " << _heading.y << "... speed " << _speed << std::endl;
     _position.x += (_speed * _heading.x);
     _position.y += (_speed * _heading.y);
+}
+
+void WorldObject::Update() {
+    move();
 }
 
 void WorldObject::turn(float radians) {
@@ -50,6 +54,5 @@ bool WorldObject::isOccupying(const WorldObject::coordinate &point) const {
     if ((abs(point.x - _position.x) < (_size / 2.0)) && (abs(point.y - _position.y) < (_size / 2.0))) return true;
 
     return false;
-
 }
 

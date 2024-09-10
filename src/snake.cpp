@@ -1,11 +1,13 @@
 #include "snake.h"
 #include <cmath>
 #include <iostream>
+#include <algorithm>
 #include "WorldObject.h"
 
 void Snake::Update() {
     UpdateHead();
     UpdateBody();
+    _energy -= 1.0 / 60.0f;  // TODO: some multiple of speed
 
     // wrap segments if necessary
 //    x = fmod(x + grid_width, grid_width);
@@ -45,8 +47,8 @@ void Snake::UpdateBody() {
         body[i] = moveBody(body[i], body[i - 1]);
     }
 
-    // Check if the snake has died
-    // TODO: change this to cut the snake
+    // Check if the player has died
+    // TODO: change this to cut the player
     for (auto const &item : body) {
         if (_position.x == item.x && _position.y == item.y) {
             alive = false;
@@ -57,45 +59,53 @@ void Snake::UpdateBody() {
 }
 
 void Snake::addBodySegment(const coordinate &ref1, const coordinate &ref2) {
-//    std::cout << "new segment, size= " << size << "  body.size() = " << body.numSegments() << std::endl;
     auto [newBearing_x, newBearing_y] = getBearing(ref1, ref2);
     addBodySegment(ref1, newBearing_x, newBearing_y);
-//    body.push_back(SDL_Point{static_cast<int>(body.back().x - new_bearing.x * segment_separation),
-//                             static_cast<int>(body.back().y - new_bearing.y * segment_separation)});
-    //numSegments++;
 }
 
 void Snake::addBodySegment(const coordinate &ref, float bearing_x, float bearing_y) {
-    //std::cout << "new segment, size= " << size << "  body.size() = " << body.numSegments() << std::endl;
     body.push_back(coordinate {ref.x - bearing_x * segment_separation, ref.y - bearing_y * segment_separation});
+    _maximumSpeed = _maximumSpeed * body.size() / (body.size() - 1);
 }
 
 void Snake::GrowBody() { growing = true; }
 
-// Inefficient method to check if cell is occupied by snake.
-bool Snake::isOccupying(const coordinate &point) const {
-    if (WorldObject::isOccupying(point)) return true;
+// Inefficient method to check if cell is occupied by player.
+size_t Snake::bodyShot(const coordinate &point) const {
+//    if (headShot(point)) return body.size() + 1;
 
-    for (auto const &item : body) {
-        if (point.x == item.x && point.y == item.y) {
-            return true;
-        }
+    for (size_t i = 0; i < body.size(); i++) {
+        const auto& item = body[i];
+        if ((abs(point.x - item.x) < (segment_size / 2.0)) && (abs(point.y - item.y) < (segment_size / 2.0)))
+            return i + 1;
     }
-    return false;
+    return 0;
 }
-
-//void Snake::move() {
-//    x += (speed * std::pow(1.05, body.size()) * heading.x);
-//    y += (speed * std::pow(1.05, body.size()) * heading.y);
-//}
-
-//void Snake::move() {
-//    x += (speed * heading.x);
-//    y += (speed * heading.y);
-//}
 
 Snake::coordinate Snake::moveBody(const coordinate &point, const coordinate &toward) {
     auto [bearing_x, bearing_y]  = getBearing(point, toward);
     return coordinate {toward.x - (segment_separation * bearing_x), toward.y - (segment_separation * bearing_y)};
+}
+
+void Snake::eat(Food *obj) {
+    obj->alive = false;
+
+    if (alive) {
+        adjustEnergy(obj->energy());
+        GrowBody();
+    }
+}
+
+void Snake::eat(Snake *obj) {
+    std::cout << "snake-eating!" << std::endl;
+    adjustEnergy(1);
+}
+
+void Snake::truncateAt(size_t index) {
+    // remove all elements from body vector after index
+    if (index < body.size())
+        body.erase(body.begin() + index, body.end());
+    // TODO: reduce energy
+    _energy *= (index - 1.0f) / body.size();
 }
 

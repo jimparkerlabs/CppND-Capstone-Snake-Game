@@ -2,10 +2,13 @@
 #define SNAKE_H
 
 #include "WorldObject.h"
+#include "food.h"
 #include <vector>
 
 class Snake : public WorldObject {
 public:
+    enum class Type { PLAYER, BLUE, RED };
+
     Snake(int grid_width, int grid_height)
             : WorldObject(grid_width, grid_height) {
         _heading = coordinate{0.0f, -1.0f};
@@ -16,21 +19,25 @@ public:
 
     // overrides of inherited attributes
     void Update() override;
-    bool isOccupying(const coordinate &point) const override;
+    bool headShot(const coordinate &point) const { return WorldObject::isOccupying(point);}
+    size_t bodyShot(const coordinate &point) const;
 
-    // snake-specific functionality
+    void eat(Food *obj);
+    void eat(Snake *obj);
+
+    void truncateAt(size_t index);
+
+    // player-specific functionality
     void GrowBody();
     int numSegments() const {return body.size() + 1;};
 
     const float segment_size = 10.0f;
-//    const float head_size = _size;
     const float segment_separation = segment_size;
-
-    bool alive{true};
 
     std::vector<coordinate> body;
 
 private:
+    Type _type {Type::PLAYER};
 
     void UpdateHead();
     void UpdateBody();
