@@ -5,7 +5,9 @@
 Game::Game(std::size_t grid_width, std::size_t grid_height)
     : engine(dev()),
       random_w(0, static_cast<int>(grid_width - 1)),
-      random_h(0, static_cast<int>(grid_height - 1)) {
+      random_h(0, static_cast<int>(grid_height - 1)),
+      grid_width(grid_width),
+      grid_height(grid_height) {
 
     gameObjects.emplace_back(std::make_unique<Snake>(grid_width / 2.0f, grid_height / 2.0f));
   PlaceFood();
@@ -116,7 +118,7 @@ void Game::Update() {
         }
     }
 
-    // TODO: check if any snakes got "got"
+    // Check if any snakes got "got"
     for (auto snake1 : snakes) {
         for (auto snake2 : snakes) {
             if (size_t index = snake2->bodyShot(snake1->position())) {
@@ -133,10 +135,18 @@ void Game::Update() {
         }
     }
 
+    // Check if anything went off screen and handle
+    for (auto &obj: gameObjects) {
+        if (obj->position().x < 0 || obj->position().x > grid_width || obj->position().y < 0 ||
+            obj->position().y > grid_height) {
+            obj->alive = false;
+        }
+    }
+
     // TODO: remove "dead" food and objects off the screen and handle dead snakes
     gameObjects.erase(
-            std::remove_if(gameObjects.begin(), gameObjects.end(), [this](const std::unique_ptr<WorldObject> &obj) {
-                return !obj->alive || !visible(obj.get());
+            std::remove_if(gameObjects.begin() + 1, gameObjects.end(), [this](const std::unique_ptr<WorldObject> &obj) {
+                return (!obj->alive || !visible(obj.get()));
             }), gameObjects.end());
 
     PlaceFood();

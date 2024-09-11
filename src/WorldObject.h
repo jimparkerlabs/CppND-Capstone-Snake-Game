@@ -56,8 +56,6 @@ protected:
 
     static std::pair<float, float> getBearing(const coordinate &from, const coordinate &to);
 
-//    int grid_width;
-//    int grid_height;
 };
 
 

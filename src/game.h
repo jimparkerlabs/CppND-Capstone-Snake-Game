@@ -37,6 +37,9 @@ private:
     void PlaceFood();
     void Update();
 
+    size_t grid_width;
+    size_t grid_height;
+
     template <typename T>
     std::vector<T*> filter(const std::vector<std::unique_ptr<WorldObject>>& objects);
 };
