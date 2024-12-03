@@ -1,5 +1,8 @@
 #include "game.h"
 #include <iostream>
+#include <thread>
+#include <future>
+
 #include "SDL.h"
 
 Game::Game(std::size_t grid_width, std::size_t grid_height)
@@ -70,64 +73,84 @@ void Game::PlaceFood() {
 }
 
 void Game::Update() {
-    Snake &player = *dynamic_cast<Snake*>(gameObjects[0].get());
+    Snake* player = dynamic_cast<Snake*>(gameObjects[0].get());
 
-    if (player.energy() <= 0.0f) player.alive = false;
+    if (player->energy() <= 0.0f) player->alive = false;
 
-    if (!player.alive) return;
+    if (!player->alive) return;
+
+    // update all gameObjects in parallel
+    std::vector<std::thread> threads;
 
     for (auto &obj : gameObjects) {
-        obj->Update();
-
-//        // bounce gameObjects that ran off the screen
-//        if (obj->position().x > 100) {
-//            // bounce left
-//        } else if (obj->position().x < 0) {
-//            // bounce right
-//        } else if (obj->position().y < 0) {
-//            // bounce down
-//        } else if (obj->position().y > 100) {
-//            // bounce up
-//        }
+        threads.emplace_back([&obj]() { obj->Update(); });
     }
 
+    // wait for all the updates to complete
+    for (auto& t : threads) {
+        if (t.joinable()) {
+            t.join();
+        }
+    }
 
-    auto food = filter<Food>(gameObjects);
+    auto foods = filter<Food>(gameObjects);
     auto snakes = filter<Snake>(gameObjects);
     auto snakeParts = filter<SnakePart>(gameObjects);
 
-    // Check if any snakes got any food
+    // see if any snakes got anything
     for (auto snake : snakes) {
-        for (auto fd: food) {
-            if (gotFood(snake, fd)) {
-                score += static_cast<int>(fd->energy());
-                snake->eat(fd);
+        // Check if snake got any foods
+        for (auto food: foods) {
+            if (gotFood(snake, food)) {
+                if (snake == player) {
+                    score += static_cast<int>(food->energy());
+                }
+                snake->eat(food);
                 break;  // can only be one Food item here
             }
         }
-    }
 
-    // Check if any snakes got any snake parts
-    for (auto snake : snakes) {
-        for (auto fd: snakeParts) {
-            if (gotFood(snake, fd)) {
-                score += static_cast<int>(fd->energy());
-                snake->eat(fd);
-                break;  // can only be one Food item here
+        // Check if snake got any snake parts
+        for (auto snakePart: snakeParts) {
+            if (gotFood(snake, snakePart)) {
+                if (snake == player) {
+                    score += static_cast<int>(snakePart->energy());
+                }
+                snake->eat(snakePart);
+                break;  // can only be one snakePart here
             }
         }
-    }
 
-    // Check if any snakes got "got"
-    for (auto snake1 : snakes) {
-        for (auto snake2 : snakes) {
-            if (size_t index = snake2->bodyShot(snake1->position())) {
-                // snake1 got snake2
-                std::cout << "index: " << index << std::endl;
-                snake1->eat(snake2);
-                // cut snake2
-                auto coords = snake2->truncateAt(index - 1);
-                std::cout << coords.size() << std::endl;
+        // Check if snake got another snake
+        // otherSnake->bodyShot is potentially expensive; run them all in parallel and return results as a vector of futures
+        std::vector<std::promise<size_t>> promises;
+        std::vector<std::thread> bodyShotThreads;
+
+        for (auto otherSnake : snakes) {
+            promises.emplace_back();  // create a promise for the returned value
+            std::promise<size_t>& prms = promises.back();  // get a reference to the promise just created
+            bodyShotThreads.emplace_back([&prms, &otherSnake, &snake]() {
+                prms.set_value(otherSnake->bodyShot(snake->position()));
+            });
+        }
+
+        // wait for all the bodyShotThreads to complete
+        for (auto& t : bodyShotThreads) {
+            if (t.joinable()) {
+                t.join();
+            }
+        }
+
+        for (size_t i=0; i < promises.size(); ++i) {
+            if (size_t index = promises[i].get_future().get()) {
+                Snake* otherSnake = snakes[i];
+                // snake got otherSnake
+                snake->eat(otherSnake);
+
+                // cut otherSnake
+                auto coords = otherSnake->truncateAt(index - 1);
+
+                // turn otherSnake's tail into snake parts
                 for (auto coord: coords) {
                     gameObjects.emplace_back(std::make_unique<SnakePart>(coord.x, coord.y));
                 }
@@ -143,7 +166,7 @@ void Game::Update() {
         }
     }
 
-    // TODO: remove "dead" food and objects off the screen and handle dead snakes
+    // remove "dead" foods and objects off the screen and handle dead snakes
     gameObjects.erase(
             std::remove_if(gameObjects.begin() + 1, gameObjects.end(), [this](const std::unique_ptr<WorldObject> &obj) {
                 return (!obj->alive || !visible(obj.get()));
