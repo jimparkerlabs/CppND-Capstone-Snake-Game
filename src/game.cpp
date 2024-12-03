@@ -79,16 +79,16 @@ void Game::Update() {
     for (auto &obj : gameObjects) {
         obj->Update();
 
-        // bounce gameObjects that ran off the screen
-        if (obj->position().x > 100) {
-            // bounce left
-        } else if (obj->position().x < 0) {
-            // bounce right
-        } else if (obj->position().y < 0) {
-            // bounce down
-        } else if (obj->position().y > 100) {
-            // bounce up
-        }
+//        // bounce gameObjects that ran off the screen
+//        if (obj->position().x > 100) {
+//            // bounce left
+//        } else if (obj->position().x < 0) {
+//            // bounce right
+//        } else if (obj->position().y < 0) {
+//            // bounce down
+//        } else if (obj->position().y > 100) {
+//            // bounce up
+//        }
     }
 
 
