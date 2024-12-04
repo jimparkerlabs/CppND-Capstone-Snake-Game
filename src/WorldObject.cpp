@@ -17,9 +17,10 @@ std::pair<float, float> WorldObject::getBearing(const coordinate &from, const co
 }
 
 void WorldObject::move() {
-//    std::cout << "heading: " << _heading.x << " " << _heading.y << "... speed " << _speed << std::endl;
+    std::cout << "heading: " << _heading.x << " " << _heading.y << "... speed " << _speed << " ...x, y " << _position.x << ", " << _position.y << std::endl;
     _position.x += (_speed * _heading.x);
     _position.y += (_speed * _heading.y);
+    std::cout << "-> x, y " << _position.x << ", " << _position.y << std::endl;
 }
 
 void WorldObject::Update() {
