@@ -20,11 +20,13 @@ void Controller::HandleInput(bool &running, Snake &snake) const {
             switch (e.key.keysym.sym) {
                 case SDLK_UP:
                 case SDLK_w:
+                    std::cout << "up" << std::endl;
                     snake.adjustSpeed(snake.speed() * 0.05f);
                     break;
 
                 case SDLK_DOWN:
                 case SDLK_s:
+                    std::cout << "down" << std::endl;
                     snake.adjustSpeed(snake.speed() * -0.05f);
                     break;
 
