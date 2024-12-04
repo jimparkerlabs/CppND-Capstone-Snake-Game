@@ -32,8 +32,8 @@ void Controller::HandleInput(bool &running, Snake &snake) const {
 
                 case SDLK_LEFT:
                 case SDLK_a:
-                    std::cout << "left" << std::endl;
-                    // ChangeHeading(snake, -M_PI / 18.0 * std::pow(1.05, snake.numSegments()));
+                    std::cout << "left " << -M_PI / 18.0 << " " << snake.numSegments() << " " << std::pow(1.05, snake.numSegments()) << std::endl;
+                    ChangeHeading(snake, -M_PI / 18.0 * std::pow(1.05, snake.numSegments()));
                     break;
 
                 case SDLK_RIGHT:
