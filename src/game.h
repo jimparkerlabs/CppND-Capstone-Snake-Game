@@ -18,17 +18,18 @@ public:
     int GetSize() const;
 
 private:
-    // TODO: vector of gameObjects
     std::vector<std::unique_ptr<WorldObject>> gameObjects;
 
     std::random_device dev;
     std::mt19937 engine;
     std::uniform_real_distribution<float> random_w;
     std::uniform_real_distribution<float> random_h;
-//    std::uniform_int_distribution<int> random_w;
-//    std::uniform_int_distribution<int> random_h;
 
-    const int numFoodToPlace = 6;
+    const int numFoodToPlace = 8;
+
+    const size_t grid_width;
+    const size_t grid_height;
+
     int score{0};
 
     bool gotFood(const Snake *snake, const WorldObject *fd) const;
@@ -36,9 +37,6 @@ private:
 
     void PlaceFood();
     void Update();
-
-    size_t grid_width;
-    size_t grid_height;
 
     template <typename T>
     std::vector<T*> filter(const std::vector<std::unique_ptr<WorldObject>>& objects);

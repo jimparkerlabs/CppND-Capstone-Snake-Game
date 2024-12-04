@@ -15,17 +15,14 @@ public:
         float y;
     };
 
-//    WorldObject(int grid_width, int grid_height) :
-//            _position({grid_width / 2.0f, grid_height / 2.0f}) {}
-
     WorldObject(float x, float y) :
             _position({x, y}) {}
 
     virtual ~WorldObject() {};
 
-    virtual coordinate position() const {return _position;}
-
     bool alive{true};
+
+    virtual coordinate position() const {return _position;}
 
     virtual float energy() const {return _energy;}
     virtual void adjustEnergy(float deltaEnergy);
@@ -38,8 +35,6 @@ public:
 
     virtual float size() const {return _size;}
     virtual bool isOccupying(const coordinate &point) const;
-
-//    int type{0};
 
     virtual void move();
     virtual void Update();
