@@ -12,7 +12,7 @@ public:
     Snake(float x, float y)
             : WorldObject(x, x) {
         _heading = coordinate{0.0f, -1.0f};
-        _speed = 0.1f;
+        _speed = 1.0f;
         _energy = 100.0f,
         _size = 15;
     }

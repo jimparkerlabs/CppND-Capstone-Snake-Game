@@ -5,11 +5,11 @@
 #include "WorldObject.h"
 
 void Snake::Update() {
-    std::cout << "updating head" << std::endl;
+//    std::cout << "updating head" << std::endl;
     UpdateHead();
-    std::cout << "updated head" << std::endl;
+//    std::cout << "updated head" << std::endl;
     UpdateBody();
-    std::cout << "updated body" << std::endl;
+//    std::cout << "updated body" << std::endl;
     _energy -= 1.0 / 60.0f;  // TODO: some multiple of speed
 }
 
@@ -90,7 +90,7 @@ void Snake::eat(WorldObject *obj) {
 }
 
 void Snake::eat(Snake *obj) {
-    std::cout << "snake-eating!" << std::endl;
+//    std::cout << "snake-eating!" << std::endl;
     adjustEnergy(1);
 }
 

@@ -11,34 +11,33 @@
 
 void Controller::HandleInput(bool &running, Snake &snake) const {
     SDL_Event e;
-    long i = 0;
     while (SDL_PollEvent(&e)) {
-        std::cout << i++ << "  " << e.type << std::endl;
+//        std::cout << i++ << "  " << e.type << std::endl;
         if (e.type == SDL_QUIT) {
             running = false;
         } else if (e.type == SDL_KEYDOWN) {
             switch (e.key.keysym.sym) {
                 case SDLK_UP:
                 case SDLK_w:
-                    std::cout << "up" << std::endl;
+//                    std::cout << "up" << std::endl;
                     snake.adjustSpeed(snake.speed() * 0.05f);
                     break;
 
                 case SDLK_DOWN:
                 case SDLK_s:
-                    std::cout << "down" << std::endl;
+//                    std::cout << "down" << std::endl;
                     snake.adjustSpeed(snake.speed() * -0.05f);
                     break;
 
                 case SDLK_LEFT:
                 case SDLK_a:
-                    std::cout << "left " << -M_PI / 18.0 << " " << snake.numSegments() << " " << std::pow(1.05, snake.numSegments()) << std::endl;
+//                    std::cout << "left " << -M_PI / 18.0 << " " << snake.numSegments() << " " << std::pow(1.05, snake.numSegments()) << std::endl;
                     ChangeHeading(snake, -M_PI / 18.0 * std::pow(1.05, snake.numSegments()));
                     break;
 
                 case SDLK_RIGHT:
                 case SDLK_d:
-                    std::cout << "right" << std::endl;
+//                    std::cout << "right" << std::endl;
                     ChangeHeading(snake, M_PI / 18.0 * std::pow(1.05, snake.numSegments()));
                     break;
                 case SDLK_SPACE:
@@ -52,7 +51,7 @@ void Controller::HandleInput(bool &running, Snake &snake) const {
             }
         }
     }
-    std::cout << "end of HandleInput" << std::endl;
+//    std::cout << "end of HandleInput" << std::endl;
 }
 
 void Controller::ChangeHeading(Snake &snake, float radians) const {
@@ -60,7 +59,7 @@ void Controller::ChangeHeading(Snake &snake, float radians) const {
 //    float _y = player._heading._y;
 //    player._heading.x = x * std::cos(radians) - _y * std::sin(radians);
 //    player._heading._y = x * std::sin(radians) + _y * std::cos(radians);
-    std::cout << "turning snake ";
+//    std::cout << "turning snake ";
     snake.turn(radians);
-    std::cout << radians << " radians" << std::endl;
+//    std::cout << radians << " radians" << std::endl;
 }

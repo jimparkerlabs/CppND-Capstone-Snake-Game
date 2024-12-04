@@ -31,12 +31,8 @@ void Game::Run(Controller const &controller, Renderer &renderer,
 
     // Input, Update, Render - the main game loop.
     controller.HandleInput(running, player);
-    std::cout << "input handled! " << running << std::endl;
     Update();
-    std::cout << "updated " << std::endl;
-//    renderer.Render(player, food);
     renderer.Render(gameObjects);
-    std::cout << "rendered!" << std::endl;
 
     frame_end = SDL_GetTicks();
 
