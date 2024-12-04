@@ -5,8 +5,11 @@
 #include "WorldObject.h"
 
 void Snake::Update() {
+    std::cout << "updating head" << std::endl;
     UpdateHead();
+    std::cout << "updated head" << std::endl;
     UpdateBody();
+    std::cout << "updated body" << std::endl;
     _energy -= 1.0 / 60.0f;  // TODO: some multiple of speed
 }
 
@@ -39,13 +42,13 @@ void Snake::UpdateBody() {
 
     // Check if the player has died
     // TODO: change this to cut the player
-    for (auto const &item : body) {
-        if (_position.x == item.x && _position.y == item.y) {
-            alive = false;
-            std::cout << "You are dead!" << std::endl;
-            alive = true;
-        }
-    }
+//    for (auto const &item : body) {
+//        if (_position.x == item.x && _position.y == item.y) {
+//            alive = false;
+//            std::cout << "You are dead!" << std::endl;
+//            alive = true;
+//        }
+//    }
 }
 
 void Snake::addBodySegment(const coordinate &ref1, const coordinate &ref2) {
