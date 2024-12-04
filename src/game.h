@@ -27,7 +27,7 @@ private:
     std::uniform_real_distribution<float> random_w;
     std::uniform_real_distribution<float> random_h;
 
-    const int numFoodToPlace = 8;
+    const int numFoodToPlace = 0;
 
     const size_t grid_width;
     const size_t grid_height;
