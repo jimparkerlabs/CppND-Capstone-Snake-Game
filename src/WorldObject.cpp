@@ -34,8 +34,12 @@ void WorldObject::turn(float radians) {
     float rads = (radians < -_maximumTurn || radians > _maximumTurn) ? _maximumTurn : abs(radians);
     rads *= radians / abs(radians);
 
+    std::cout << rads << " " << radians << " " << hx << " " << hy << " " << std::cos(rads) << " " << std::sin(rads) << std::endl;
+
     _heading.x = hx * std::cos(rads) - hy * std::sin(rads);
     _heading.y = hx * std::sin(rads) + hy * std::cos(rads);
+    std::cout << _heading.x << " " << _heading.y << std::endl;
+
 }
 
 void WorldObject::adjustSpeed(float deltaSpeed) {
