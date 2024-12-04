@@ -3,6 +3,7 @@
 
 #include <random>
 #include <memory>
+#include <algorithm>
 #include "SDL.h"
 #include "controller.h"
 #include "renderer.h"
