@@ -56,5 +56,7 @@ void Controller::ChangeHeading(Snake &snake, float radians) const {
 //    float _y = player._heading._y;
 //    player._heading.x = x * std::cos(radians) - _y * std::sin(radians);
 //    player._heading._y = x * std::sin(radians) + _y * std::cos(radians);
+    std::cout << "turning snake ";
     snake.turn(radians);
+    std::cout << radians << " radians" << std::endl;
 }
