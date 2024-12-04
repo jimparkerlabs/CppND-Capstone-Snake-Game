@@ -12,6 +12,7 @@
 void Controller::HandleInput(bool &running, Snake &snake) const {
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
+        std::cout << e.type << std::endl;
         if (e.type == SDL_QUIT) {
             running = false;
         } else if (e.type == SDL_KEYDOWN) {
@@ -28,16 +29,18 @@ void Controller::HandleInput(bool &running, Snake &snake) const {
 
                 case SDLK_LEFT:
                 case SDLK_a:
+                    std::cout << "left" << std::endl;
                     ChangeHeading(snake, -M_PI / 18.0 * std::pow(1.05, snake.numSegments()));
                     break;
 
                 case SDLK_RIGHT:
                 case SDLK_d:
+                    std::cout << "right" << std::endl;
                     ChangeHeading(snake, M_PI / 18.0 * std::pow(1.05, snake.numSegments()));
                     break;
                 case SDLK_SPACE:
                     // TODO: change this to a pause
-                    snake.GrowBody();
+                    // snake.GrowBody();
                     break;
 
                 case SDLK_ESCAPE:
