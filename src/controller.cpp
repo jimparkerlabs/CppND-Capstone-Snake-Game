@@ -11,8 +11,9 @@
 
 void Controller::HandleInput(bool &running, Snake &snake) const {
     SDL_Event e;
+    long i = 0;
     while (SDL_PollEvent(&e)) {
-        std::cout << e.type << std::endl;
+        std::cout << i++ << "  " << e.type << std::endl;
         if (e.type == SDL_QUIT) {
             running = false;
         } else if (e.type == SDL_KEYDOWN) {
@@ -49,6 +50,7 @@ void Controller::HandleInput(bool &running, Snake &snake) const {
             }
         }
     }
+    std::cout << "end of HandleInput" << std::endl;
 }
 
 void Controller::ChangeHeading(Snake &snake, float radians) const {
