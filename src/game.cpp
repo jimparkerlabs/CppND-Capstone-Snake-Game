@@ -149,14 +149,17 @@ void Game::Update() {
                 Snake* otherSnake = snakes[i];
                 // snake got otherSnake
                 snake->eat(otherSnake);
-
+                std::cout << "ate a snake ";
                 // cut otherSnake
                 auto coords = otherSnake->truncateAt(index - 1);
+                std::cout << "cut a snake ";
 
                 // turn otherSnake's tail into snake parts
                 for (auto coord: coords) {
                     gameObjects.emplace_back(std::make_unique<SnakePart>(coord.x, coord.y));
                 }
+                std::cout << "snake food!" << std::endl;
+
             }
         }
     }
